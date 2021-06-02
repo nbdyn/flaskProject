@@ -1,0 +1,23 @@
+{
+  "id": "2582771",
+  "name": "xai",
+  "font_family": "iconfont",
+  "css_prefix_text": "icon-",
+  "description": "",
+  "glyphs": [
+    {
+      "icon_id": "19249589",
+      "name": "刷新",
+      "font_class": "shuaxin",
+      "unicode": "e73f",
+      "unicode_decimal": 59199
+    },
+    {
+      "icon_id": "8718493",
+      "name": "csv",
+      "font_class": "csv",
+      "unicode": "e613",
+      "unicode_decimal": 58899
+    }
+  ]
+}

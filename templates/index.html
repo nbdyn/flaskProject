@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>XAI可解释性评估系统</title>
+    <!--bootstrap-->
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+	<script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+	<script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <!--bootstrap file-->
+    <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename = 'bootstrap-fileinput/css/fileinput.css') }}" />
+    <script type="text/javascript" src="{{ url_for('static', filename = 'bootstrap-fileinput/js/fileinput.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename = 'bootstrap-fileinput/js/locales/zh.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename = 'js/fileinput.js') }}"></script>
+    <!--iconfont-->
+    <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename = 'iconcss/iconfont.css') }}" />
+    <!--bootstrap-select-->
+    <script type="text/javascript" src="{{ url_for('static', filename = 'bootstrap-select/js/bootstrap-select.js') }}"></script>
+    <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename = 'bootstrap-select/css/bootstrap-select.css') }}" />
+    <style>
+        .row-margin-top {margin-top: 20px;}
+    </style>
+</head>
+
+<body>
+<!--导航条-->
+<nav class="navbar navbar-default" role="navigation">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="/">XAI可解释性评估系统</a>
+        </div>
+    </div>
+</nav>
+<!--读取数据集-->
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h5>测试数据集选择</h5>
+    </div>
+    <div class="panel-body">
+        <div class="container">
+            <div class="row row-margin-top">
+                <div class="col-xs-4">
+                    <select id="dataset_select" class="selectpicker" data-style="btn-primary"></select>
+                    <botton onclick=dataset_select_update() style="margin-left: 20px; cursor: pointer"><i class="iconfont icon-shuaxin"></i></botton>
+                </div>
+                <div class="col-xs-6">
+                    <form id="form" action="/dataupload" method="post" enctype="multipart/form-data">
+                        <input id="dataset_fileinput" name="dataset" type="file" multiple class="file"/>
+                    </form>
+                </div>
+            </div>
+            <div class="row row-margin-top"><p></br>若需要自行上传数据集，需要同时上传训练集与测试集，其中训练集的命名格式为：数据集名称_train.csv，测试集的命名格式为：数据集名称_test.csv。
+            </br>按ctrl键点击文件即可多选，上传后数据集点击刷新按钮即可在已有数据集中进行选择。</p></div>
+        </div>
+    </div>
+</div>
+<!--读取黑盒和代理模型-->
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h5>黑盒模型及代理模型选择</h5>
+    </div>
+    <div class="panel-body">
+        <div id="blackproxy" class="container">
+            <div class="row row-margin-top">
+                <div class="col-xs-6">
+                    <form id="form" action="/dataupload" method="post" enctype="multipart/form-data">
+                        <input id="blackbox_fileinput" name="blackbox" type="file" multiple class="file"/>
+                    </form>
+                </div>
+                <div class="col-xs-6">
+                    <form id="form" action="/dataupload" method="post" enctype="multipart/form-data">
+                        <input id="proxy_fileinput" name="proxy" type="file" multiple class="file"/>
+                    </form>
+                </div>
+            </div>
+            <hr>
+            <div class="row row-margin-top" id="select1">
+                <div class="col-xs-1"><p>XAI1</p></div>
+                <div class="col-xs-4">
+                        <select id="blackbox_select1" class="selectpicker" data-style="btn-primary"></select>
+                        <botton onclick=black_select_update() style="margin-left: 20px; cursor: pointer"><i class="iconfont icon-shuaxin"></i></botton>
+                </div>
+                <div class="col-xs-4">
+                        <select id="proxy_select1" class="selectpicker" data-style="btn-primary"></select>
+                        <botton onclick=proxy_select_update() style="margin-left: 20px; cursor: pointer"><i class="iconfont icon-shuaxin"></i></botton>
+                </div>
+                <div class="col-xs-1" id="add_div"><button class="btn btn-default" onclick="add()" id="add">添加</button></div>
+                <div class="col-xs-1" id="pop_div"><button class="btn btn-default" onclick="pop()" id="pop">删除</button></div>
+            </div>
+        </div>
+        <div class="container"><p></br>若需要自行上传数据集，需要同时上传训练集与测试集，其中训练集的命名格式为：数据集名称_train.csv，测试集的命名格式为：数据集名称_test.csv。
+            </br>按ctrl键点击文件即可多选，上传后数据集点击刷新按钮即可在已有数据集中进行选择。
+            </br>若想对多个XAI进行评估，点击右侧的添加按钮进行选择，点击右侧的删除按钮则删除对应的XAI。</p></div>
+    </div>
+</div>
+
+<div class="dropdown">
+  <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+    Dropdown
+    <span class="caret"></span>
+  </button>
+  <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+    <li><a href="#">Action</a></li>
+    <li><a href="#">Another action</a></li>
+    <li><a href="#">Something else here</a></li>
+    <li role="separator" class="divider"></li>
+    <li><a href="#">Separated link</a></li>
+  </ul>
+</div>
+
+
+<button class="btn btn-primary" onclick=submit_all()>提交</button>
+<script>
+    var num = 1;  {#记录黑盒以及代理模型下拉框的个数#}
+    {#文件上传框初始化#}
+    initFileInput("dataset_fileinput", "/dataupload", ["csv"]);
+    initFileInput("blackbox_fileinput", "/dataupload", ["pkl"]);
+    initFileInput("proxy_fileinput", "/dataupload", ["txt"])
+    {#下拉框初始化#}
+
+    init_select()
+</script>
+
+</body>
+</html>
